@@ -1,10 +1,10 @@
 #include "wordPieceTokenizer.h"
-#include <iostream>
 
 wordPieceTokenizer::wordPieceTokenizer(std::vector<std::string> corpus) {
 	this->corpus = corpus;
 }
 
+// Takes a list of strings and returns a list of all unique substrings separated by delim (default " ")
 std::vector<std::string> wordPieceTokenizer::splitCorpus(std::vector<std::string> corpus, const char* delim) {
     std::vector<std::string> tokens;
     std::string word = "";
@@ -28,6 +28,7 @@ std::vector<std::string> wordPieceTokenizer::splitCorpus(std::vector<std::string
     return tokens;
 }
 
+// Like splitCorpus, but for a single string
 std::vector<std::string> wordPieceTokenizer::splitText(std::string str, const char* delim) {
     std::vector<std::string> tokens;
     std::string word = "";
@@ -49,6 +50,7 @@ std::vector<std::string> wordPieceTokenizer::splitText(std::string str, const ch
     return tokens;
 }
 
+// Returns frequency of each substring acorss list of vectors
 std::map<std::string, int> wordPieceTokenizer::getTokenFrequencies(std::vector<std::string> texts, const char* delim) {
     std::map<std::string, int> tokenFrequency;
     std::string word = "";
@@ -68,6 +70,9 @@ std::map<std::string, int> wordPieceTokenizer::getTokenFrequencies(std::vector<s
     return tokenFrequency;
 }
 
+// Creates a dictionary where the key is the associated word and the values are each character
+// All charcters after the first will have a ## preceding it
+// Ex. "Words" becomes {"Words" : ["W", "##o", "##r", "##d", "##s"]}
 std::map<std::string, std::vector<std::string>> wordPieceTokenizer::splitWords(std::map<std::string, int> tokenFrequency) {
     std::map<std::string, std::vector<std::string> > splits;
     std::string chr;
@@ -86,6 +91,7 @@ std::map<std::string, std::vector<std::string>> wordPieceTokenizer::splitWords(s
     return splits;
 }
 
+// Merge p1 and p2 for each word in splits
 std::string wordPieceTokenizer::mergePair(const std::string p1, const std::string p2, std::map<std::string, std::vector<std::string>>& splits) {
     std::vector<std::string> split;
     std::string merge;
@@ -118,6 +124,7 @@ std::string wordPieceTokenizer::mergePair(const std::string p1, const std::strin
     return merge;
 }
 
+// Get the score for each pair and update score in pair frequencies
 std::map<std::pair<std::string, std::string>, double> wordPieceTokenizer::getPairScores(std::map<std::string, std::vector<std::string>> splits, std::map<std::string, int> tokenFrequencies) {
     std::map<std::string, int> letterFrequencies{};
     std::map<std::pair<std::string, std::string>, double> pairFrequencies{};
@@ -145,6 +152,7 @@ std::map<std::pair<std::string, std::string>, double> wordPieceTokenizer::getPai
     return pairFrequencies;
 }
 
+// Tokenize word using existing vocabulary
 std::vector<std::string> wordPieceTokenizer::tokenizeWord(std::string text, std::vector<std::string> vocab) {
     std::vector<std::string> tokens;
     std::string sub;
@@ -170,6 +178,7 @@ std::vector<std::string> wordPieceTokenizer::tokenizeWord(std::string text, std:
     return tokens;
 }
 
+// Generate vocabulary for all words in splits, up to vocabSize # of tokens
 std::vector<std::string> wordPieceTokenizer::getVocab(std::map<std::string, std::vector<std::string>>& splits, int vocabSize, std::map<std::string, int> tokenFrequencies) {
     std::vector<std::string> vocab({ "[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]" });
 
@@ -201,6 +210,7 @@ std::vector<std::string> wordPieceTokenizer::getVocab(std::map<std::string, std:
     return vocab;
 }
 
+// Get tokens for all strings in texts
 std::vector<std::vector<std::string>> wordPieceTokenizer::tokenize(std::vector<std::string> texts, std::vector<std::string> vocab) {
     if(vocab.empty())
         vocab = this->vocab;
@@ -221,6 +231,7 @@ std::vector<std::vector<std::string>> wordPieceTokenizer::tokenize(std::vector<s
     return result;
 }
 
+// Generate vocab for corpus
 void wordPieceTokenizer::train(int vocabSize) {
     std::map<std::string, int> tokenFrequencies = getTokenFrequencies(this->corpus);
     std::map<std::string, std::vector<std::string>> splits = splitWords(tokenFrequencies);

@@ -2,8 +2,6 @@
 #include <format>
 #include <vector>
 #include <cstring>
-#include <algorithm>
-#include <map>
 
 #include "wordPieceTokenizer.h"
 
@@ -23,6 +21,8 @@ int main()
 {
     wordPieceTokenizer wp = wordPieceTokenizer(corpus);
     wp.train();
+
+    corpus.push_back("Some words may be out of vocabulary");
 
     vector<vector<string>> res = wp.tokenize(corpus);
 
